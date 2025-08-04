@@ -5,6 +5,10 @@ let dragOverItem = null;
 // Drag and Drop
 
 grid.addEventListener('dragstart', (e) => {
+  if (e.target.classList.contains('resizer')) {
+    e.preventDefault();
+    return;
+  }
   if (e.target.classList.contains('grid-item')) {
     draggedItem = e.target;
     setTimeout(() => {
@@ -54,6 +58,7 @@ grid.addEventListener('mousedown', (e) => {
     e.stopPropagation();
     isResizing = true;
     resizingItem = e.target.closest('.grid-item');
+    resizingItem.setAttribute('draggable', 'false'); // disable drag
     startX = e.clientX;
     startWidth = parseInt(document.defaultView.getComputedStyle(resizingItem).width, 10);
     document.body.style.cursor = 'se-resize';
@@ -76,6 +81,9 @@ document.addEventListener('mousemove', (e) => {
 document.addEventListener('mouseup', () => {
   if (isResizing) {
     isResizing = false;
+    if (resizingItem) {
+      resizingItem.setAttribute('draggable', 'true'); // re-enable drag
+    }
     resizingItem = null;
     document.body.style.cursor = '';
   }
