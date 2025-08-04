@@ -20,6 +20,7 @@ grid.addEventListener('dragstart', (e) => {
 grid.addEventListener('dragend', (e) => {
   if (draggedItem) {
     draggedItem.classList.remove('dragging');
+    draggedItem.setAttribute('draggable', 'false'); // disable drag after dragend
     draggedItem = null;
   }
 });
@@ -58,10 +59,15 @@ grid.addEventListener('mousedown', (e) => {
     e.stopPropagation();
     isResizing = true;
     resizingItem = e.target.closest('.grid-item');
-    resizingItem.setAttribute('draggable', 'false'); // disable drag
     startX = e.clientX;
     startWidth = parseInt(document.defaultView.getComputedStyle(resizingItem).width, 10);
     document.body.style.cursor = 'se-resize';
+    return;
+  }
+  // Only enable drag if mousedown is on grid-item (not resizer)
+  const item = e.target.closest('.grid-item');
+  if (item && !e.target.classList.contains('resizer')) {
+    item.setAttribute('draggable', 'true');
   }
 });
 
@@ -81,9 +87,6 @@ document.addEventListener('mousemove', (e) => {
 document.addEventListener('mouseup', () => {
   if (isResizing) {
     isResizing = false;
-    if (resizingItem) {
-      resizingItem.setAttribute('draggable', 'true'); // re-enable drag
-    }
     resizingItem = null;
     document.body.style.cursor = '';
   }
