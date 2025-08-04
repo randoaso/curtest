@@ -1,0 +1,38 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+  padding: 32px;
+}
+
+.grid-item {
+  background: #f0f0f0;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  min-width: 100px;
+  min-height: 100px;
+  max-width: 100%;
+  max-height: 100%;
+  position: relative;
+  padding: 16px;
+  box-sizing: border-box;
+  user-select: none;
+  transition: box-shadow 0.2s;
+}
+
+.grid-item.dragging {
+  opacity: 0.5;
+  box-shadow: 0 0 20px #aaa;
+}
+
+.resizer {
+  width: 16px;
+  height: 16px;
+  background: #888;
+  border-radius: 4px;
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  cursor: se-resize;
+  z-index: 2;
+}
