@@ -45,44 +45,38 @@ function getDragAfterElement(container, y, x) {
 
 // Resizing
 
-grid.querySelectorAll('.grid-item').forEach(item => {
-  const resizer = item.querySelector('.resizer');
-  let isResizing = false;
-  let startX, startY, startWidth, startHeight;
+let isResizing = false;
+let resizingItem = null;
+let startX, startWidth;
 
-  resizer.addEventListener('mousedown', (e) => {
+grid.addEventListener('mousedown', (e) => {
+  if (e.target.classList.contains('resizer')) {
     e.stopPropagation();
     isResizing = true;
+    resizingItem = e.target.closest('.grid-item');
     startX = e.clientX;
-    startY = e.clientY;
-    startWidth = parseInt(document.defaultView.getComputedStyle(item).width, 10);
-    startHeight = parseInt(document.defaultView.getComputedStyle(item).height, 10);
+    startWidth = parseInt(document.defaultView.getComputedStyle(resizingItem).width, 10);
     document.body.style.cursor = 'se-resize';
-  });
+  }
+});
 
-  document.addEventListener('mousemove', (e) => {
-    if (!isResizing) return;
-    // Only allow horizontal resizing
-    let grid = document.getElementById('grid');
-    let gridStyles = window.getComputedStyle(grid);
-    let columnGap = parseInt(gridStyles.gap || gridStyles.columnGap || '16', 10);
-    // Get the computed grid column width (assume all columns are same width)
-    let gridColumn = window.getComputedStyle(item);
-    // The grid uses minmax(150px, 1fr), so snap to multiples of 150px + gap
-    let minColWidth = 150;
-    let newWidth = startWidth + (e.clientX - startX);
-    // Snap to nearest column size
-    let snappedCols = Math.round(newWidth / (minColWidth + columnGap));
-    snappedCols = Math.max(snappedCols, 1); // At least 1 column
-    let snappedWidth = snappedCols * minColWidth + (snappedCols - 1) * columnGap;
-    item.style.width = snappedWidth + 'px';
-    // Height remains fixed
-  });
+document.addEventListener('mousemove', (e) => {
+  if (!isResizing || !resizingItem) return;
+  let grid = document.getElementById('grid');
+  let gridStyles = window.getComputedStyle(grid);
+  let columnGap = parseInt(gridStyles.gap || gridStyles.columnGap || '16', 10);
+  let minColWidth = 150;
+  let newWidth = startWidth + (e.clientX - startX);
+  let snappedCols = Math.round(newWidth / (minColWidth + columnGap));
+  snappedCols = Math.max(snappedCols, 1);
+  let snappedWidth = snappedCols * minColWidth + (snappedCols - 1) * columnGap;
+  resizingItem.style.width = snappedWidth + 'px';
+});
 
-  document.addEventListener('mouseup', () => {
-    if (isResizing) {
-      isResizing = false;
-      document.body.style.cursor = '';
-    }
-  });
+document.addEventListener('mouseup', () => {
+  if (isResizing) {
+    isResizing = false;
+    resizingItem = null;
+    document.body.style.cursor = '';
+  }
 });
