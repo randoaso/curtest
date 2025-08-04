@@ -62,12 +62,21 @@ grid.querySelectorAll('.grid-item').forEach(item => {
 
   document.addEventListener('mousemove', (e) => {
     if (!isResizing) return;
+    // Only allow horizontal resizing
+    let grid = document.getElementById('grid');
+    let gridStyles = window.getComputedStyle(grid);
+    let columnGap = parseInt(gridStyles.gap || gridStyles.columnGap || '16', 10);
+    // Get the computed grid column width (assume all columns are same width)
+    let gridColumn = window.getComputedStyle(item);
+    // The grid uses minmax(150px, 1fr), so snap to multiples of 150px + gap
+    let minColWidth = 150;
     let newWidth = startWidth + (e.clientX - startX);
-    let newHeight = startHeight + (e.clientY - startY);
-    newWidth = Math.max(newWidth, 100);
-    newHeight = Math.max(newHeight, 100);
-    item.style.width = newWidth + 'px';
-    item.style.height = newHeight + 'px';
+    // Snap to nearest column size
+    let snappedCols = Math.round(newWidth / (minColWidth + columnGap));
+    snappedCols = Math.max(snappedCols, 1); // At least 1 column
+    let snappedWidth = snappedCols * minColWidth + (snappedCols - 1) * columnGap;
+    item.style.width = snappedWidth + 'px';
+    // Height remains fixed
   });
 
   document.addEventListener('mouseup', () => {
